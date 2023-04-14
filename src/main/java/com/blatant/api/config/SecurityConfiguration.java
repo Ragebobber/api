@@ -3,6 +3,7 @@ package com.blatant.api.config;
 import com.blatant.api.entity.UserRole;
 import com.blatant.api.security.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,10 +13,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration  {
+
+    @Value("${front_url}")
+    private String corsUrl;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
@@ -26,6 +31,14 @@ public class SecurityConfiguration  {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
+                .cors(cors->
+                        cors.configurationSource(request -> {
+                            CorsConfiguration corsConfigurer = new CorsConfiguration();
+                            corsConfigurer.addAllowedOrigin(corsUrl);
+                            corsConfigurer.addAllowedMethod("*");
+                            corsConfigurer.addAllowedHeader("*");
+                            return corsConfigurer;
+                        }))
                 .csrf()
                 .disable()
                 .authorizeHttpRequests(req ->req

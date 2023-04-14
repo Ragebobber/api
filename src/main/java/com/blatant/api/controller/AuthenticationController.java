@@ -6,14 +6,12 @@ import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.ResponseStatus;
 import com.blatant.api.entity.User;
 import com.blatant.api.security.JWTService;
-import com.blatant.api.security.user.UserDetailsServiceImpl;
 import com.blatant.api.security.user.UserSecurityService;
 import com.blatant.api.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,15 +50,15 @@ public class AuthenticationController {
 
             AuthenticationResponse response = new AuthenticationResponse();
 
-            response.setAccessToken(jwtService.generateToken(userDetailsService.getUser(),httpServletRequest));
+            response.setAccessToken(jwtService.generateToken(userDetailsService.user(),httpServletRequest));
 
-           log.info("User is authorized, login: {}, ip:{}",userDetailsService.getUser().getLogin(),httpServletRequest.getRemoteAddr());
+           log.info("User is authorized, login: {}, ip:{}",userDetailsService.user().getLogin(),httpServletRequest.getRemoteAddr());
 
             return ResponseEntity.ok().body(response);
         }
         catch (Exception e){
             log.warn("Login warning:{}",e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(request);
         }
     }
 
@@ -73,7 +71,7 @@ public class AuthenticationController {
         }
         catch (Exception e){
             log.warn("Login registration:{}",e.getMessage());
-            return ResponseEntity.ok().body(e.getMessage());
+            return ResponseEntity.badRequest().body(request);
         }
     }
 
@@ -82,7 +80,7 @@ public class AuthenticationController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserSecurityService userDetailsService = (UserSecurityService) authentication.getPrincipal();
         AuthenticationResponse response = new AuthenticationResponse();
-        response.setAccessToken(jwtService.generateToken(userDetailsService.getUser(), httpServletRequest));
+        response.setAccessToken(jwtService.generateToken(userDetailsService.user(), httpServletRequest));
         return ResponseEntity.ok().body(response);
     }
 

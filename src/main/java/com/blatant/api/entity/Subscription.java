@@ -1,9 +1,13 @@
 package com.blatant.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
@@ -15,11 +19,11 @@ public class Subscription {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId",nullable = false)
+    @JoinColumn(name = "user_id",nullable = false)
     private User userId;
 
-    @ManyToOne
-    @JoinColumn(name = "productId",nullable = false)
+    @OneToOne
+    @JoinColumn(name = "product_id",nullable = false)
     private Product productId;
 
     @Temporal(TemporalType.DATE)
@@ -27,7 +31,7 @@ public class Subscription {
 
     Boolean isActive;
 
-    protected Subscription() {
+    public Subscription() {
     }
 
     public Subscription(Long id, User userId, Product productId, Date expirationDate, Boolean isActive) {
@@ -45,7 +49,7 @@ public class Subscription {
     public void setId(Long id) {
         this.id = id;
     }
-
+    @JsonIgnore
     public User getUserId() {
         return userId;
     }
