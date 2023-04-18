@@ -1,5 +1,6 @@
 package com.blatant.api.service;
 
+import com.blatant.api.dto.AdminUserResponse;
 import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.UserResponse;
 import com.blatant.api.dto.UserSubscriptionResponse;
@@ -65,7 +66,11 @@ public class UserService {
         return user.getUserSubscription();
     }
 
+    public List<AdminUserResponse> getAllUsers(){
+        List<User> allUsers = userRepository.findAll();
+        return allUsers.stream().map(elem -> mapper.map(elem,AdminUserResponse.class)).toList();
 
+    }
     private UserSecurityService getUserSecurity(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserSecurityService) authentication.getPrincipal();

@@ -1,5 +1,6 @@
 package com.blatant.api.controller;
 
+import com.blatant.api.dto.AdminUserResponse;
 import com.blatant.api.dto.UserResponse;
 import com.blatant.api.dto.UserSubscriptionResponse;
 import com.blatant.api.entity.Subscription;
@@ -46,6 +47,17 @@ public class UserController {
         }
         catch (Exception exception){
             log.warn("Get user subs error:{}",exception.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    @GetMapping("/admin/users")
+    public ResponseEntity<?> getAllUsers(){
+        try {
+            List<AdminUserResponse> response = userService.getAllUsers();
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception exception){
+            log.warn("Admin get all users: {}",exception.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
