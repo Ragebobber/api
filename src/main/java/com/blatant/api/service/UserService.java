@@ -2,6 +2,7 @@ package com.blatant.api.service;
 
 import com.blatant.api.dto.AdminUserResponse;
 import com.blatant.api.dto.RegisterRequest;
+import com.blatant.api.dto.UserRequest;
 import com.blatant.api.dto.UserResponse;
 import com.blatant.api.dto.UserSubscriptionResponse;
 import com.blatant.api.entity.Subscription;
@@ -71,6 +72,14 @@ public class UserService {
         return allUsers.stream().map(elem -> mapper.map(elem,AdminUserResponse.class)).toList();
 
     }
+
+    public AdminUserResponse blockUser( @NonNull UserRequest request){
+        User user = userRepository.findByLogin(request.getLogin()).orElseThrow(()-> new UsernameNotFoundException("User not found!"));
+        user.setStatus(user.getStatus().equals(UserStatus.ACTIVE) ? UserStatus.BLOCKED : UserStatus.ACTIVE);
+        userRepository.save(user);
+        return mapper.map(user, AdminUserResponse.class);
+    }
+
     private UserSecurityService getUserSecurity(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserSecurityService) authentication.getPrincipal();

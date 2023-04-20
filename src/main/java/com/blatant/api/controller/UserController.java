@@ -1,6 +1,7 @@
 package com.blatant.api.controller;
 
 import com.blatant.api.dto.AdminUserResponse;
+import com.blatant.api.dto.UserRequest;
 import com.blatant.api.dto.UserResponse;
 import com.blatant.api.dto.UserSubscriptionResponse;
 import com.blatant.api.entity.Subscription;
@@ -9,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,6 +61,18 @@ public class UserController {
         }
         catch (Exception exception){
             log.warn("Admin get all users: {}",exception.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/admin/block/user")
+    public ResponseEntity<?> blockUser(@RequestBody UserRequest request){
+        try {
+            AdminUserResponse response = userService.blockUser(request);
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception exception){
+            log.warn("Admin block user: {}",exception.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
