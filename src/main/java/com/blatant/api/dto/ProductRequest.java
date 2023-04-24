@@ -1,6 +1,8 @@
 package com.blatant.api.dto;
 
 public class ProductRequest {
+
+    private Long id;
     private String description;
     private String name;
     private String status;
@@ -28,5 +30,13 @@ public class ProductRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
