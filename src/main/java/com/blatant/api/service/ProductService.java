@@ -35,21 +35,28 @@ public class ProductService {
         return mapper.map(savedProduct, ProductResponse.class);
     }
 
-    public ProductResponse activeProduct(@NonNull ProductRequest request) throws ProductNotFound {
-        Product findProduct = productRepository.findById(request.getId())
+    public ProductResponse activeProduct(@NonNull Long id) throws ProductNotFound {
+        Product findProduct = productRepository.findById(id)
                 .orElseThrow(()->
                         new ProductNotFound("Product not found!"));
         findProduct.setStatus(findProduct.getStatus().equals(ProductStatus.ACTIVE) ? ProductStatus.DISABLE : ProductStatus.ACTIVE);
         productRepository.save(findProduct);
         return mapper.map(findProduct, ProductResponse.class);
     }
-    public ProductResponse edditProduct(@NonNull ProductRequest request) throws ProductNotFound {
-        Product findProduct = productRepository.findById(request.getId())
+    public ProductResponse edditProduct(Long id,@NonNull ProductRequest request) throws ProductNotFound {
+        Product findProduct = productRepository.findById(id)
                 .orElseThrow(()->
                         new ProductNotFound("Product not found!"));
         findProduct.setName(request.getName());
         findProduct.setDescription(request.getDescription());
         productRepository.save(findProduct);
+        return mapper.map(findProduct, ProductResponse.class);
+    }
+    public ProductResponse deleteProduct(Long id) throws ProductNotFound {
+        Product findProduct = productRepository.findById(id)
+                .orElseThrow(()->
+                        new ProductNotFound("Product not found!"));
+        productRepository.delete(findProduct);
         return mapper.map(findProduct, ProductResponse.class);
     }
 
