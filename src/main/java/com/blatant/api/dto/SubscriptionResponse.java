@@ -1,11 +1,15 @@
 package com.blatant.api.dto;
 
+import com.blatant.api.entity.Product;
+
 import java.util.Date;
 
 public class SubscriptionResponse {
     private Long id;
     private Date expirationDate;
     Boolean isActive;
+
+    private Product productId;
 
     public Long getId() {
         return id;
@@ -29,5 +33,13 @@ public class SubscriptionResponse {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public Product getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Product productId) {
+        this.productId = productId;
     }
 }
