@@ -11,7 +11,7 @@ import com.blatant.api.entity.UserStatus;
 import com.blatant.api.exception.RegistrationException;
 import com.blatant.api.repository.UserRepository;
 import com.blatant.api.security.user.UserSecurityService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -38,7 +39,7 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(@NonNull RegisterRequest request) throws RegistrationException {
+    public UserResponse registerUser(@NonNull RegisterRequest request) throws RegistrationException {
         User user =  userRepository.findByLogin(request.getLogin()).orElse(null);
         if(user != null)
             throw new RegistrationException("User already exists" + user);
@@ -48,7 +49,8 @@ public class UserService {
         user.setPassword(encoder.encode(request.getPassword()));
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.ACTIVE);
-        return userRepository.save(user);
+
+        return  mapper.map(user,UserResponse.class);
     }
 
     public UserResponse getCurrnetUser(){
@@ -68,7 +70,7 @@ public class UserService {
         return allUsers.stream().map(elem -> mapper.map(elem,AdminUserResponse.class)).toList();
 
     }
-
+    @Transactional
     public AdminUserResponse blockUser( @NonNull UserRequest request){
         User user = userRepository.findByLogin(request.getLogin()).orElseThrow(()-> new UsernameNotFoundException("User not found!"));
         user.setStatus(user.getStatus().equals(UserStatus.ACTIVE) ? UserStatus.BLOCKED : UserStatus.ACTIVE);

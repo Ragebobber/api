@@ -11,12 +11,14 @@ import com.blatant.api.exception.SubscriptionNotFound;
 import com.blatant.api.repository.ProductRepository;
 import com.blatant.api.repository.SubscriptionRepository;
 import com.blatant.api.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional(readOnly = true)
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final ModelMapper mapper;
@@ -29,14 +31,14 @@ public class SubscriptionService {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
     }
-
+    @Transactional
     public SubscriptionResponse activeSub(Long id) throws SubscriptionNotFound {
         Subscription subscription = subscriptionRepository.findById(id).orElseThrow(()-> new SubscriptionNotFound("No subs"));
         subscription.setActive(!subscription.getActive());
         subscriptionRepository.save(subscription);
         return mapper.map(subscription, SubscriptionResponse.class);
     }
-
+    @Transactional
     public SubscriptionResponse addSub(@NonNull SubscriptionRequest request) throws ProductNotFound, AddUserSubscriptionException {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(()-> new UsernameNotFoundException("User not found!"));
