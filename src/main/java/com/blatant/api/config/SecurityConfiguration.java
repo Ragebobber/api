@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfiguration  {
 
-    @Value("${front_url}")
+    @Value("${frontendURL}")
     private String corsUrl;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
@@ -40,11 +40,16 @@ public class SecurityConfiguration  {
                         }))
                 .csrf()
                 .disable()
+                .httpBasic()
+                .disable()
                 .authorizeHttpRequests(req ->req
                         .requestMatchers("/api/auth/v1/login","/api/auth/v1/registration")
                         .permitAll()
+                        .requestMatchers(request -> request.getRequestURL().toString().contains("admin"))
+                        .hasAuthority("ADMIN")
                         .anyRequest()
-                        .authenticated())
+                        .authenticated()
+                )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
