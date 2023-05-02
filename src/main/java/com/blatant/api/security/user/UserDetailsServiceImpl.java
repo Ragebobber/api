@@ -1,8 +1,7 @@
 package com.blatant.api.security.user;
 
-import com.blatant.api.repository.UserRepository;
 import com.blatant.api.entity.User;
-import jakarta.transaction.Transactional;
+import com.blatant.api.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

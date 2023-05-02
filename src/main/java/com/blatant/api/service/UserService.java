@@ -4,14 +4,11 @@ import com.blatant.api.dto.AdminUserResponse;
 import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.UserRequest;
 import com.blatant.api.dto.UserResponse;
-import com.blatant.api.dto.UserSubscriptionResponse;
 import com.blatant.api.entity.Subscription;
 import com.blatant.api.entity.User;
 import com.blatant.api.entity.UserRole;
 import com.blatant.api.entity.UserStatus;
 import com.blatant.api.exception.RegistrationException;
-import com.blatant.api.exception.UserSubscriptionNotFound;
-import com.blatant.api.repository.SubscriptionRepository;
 import com.blatant.api.repository.UserRepository;
 import com.blatant.api.security.user.UserSecurityService;
 import jakarta.transaction.Transactional;
@@ -24,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {

@@ -3,7 +3,6 @@ package com.blatant.api.controller;
 import com.blatant.api.dto.AdminUserResponse;
 import com.blatant.api.dto.UserRequest;
 import com.blatant.api.dto.UserResponse;
-import com.blatant.api.dto.UserSubscriptionResponse;
 import com.blatant.api.entity.Subscription;
 import com.blatant.api.service.UserService;
 import org.slf4j.Logger;
