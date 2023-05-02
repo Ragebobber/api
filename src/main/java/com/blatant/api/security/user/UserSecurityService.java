@@ -2,7 +2,6 @@ package com.blatant.api.security.user;
 
 import com.blatant.api.entity.User;
 import com.blatant.api.entity.UserStatus;
-import jakarta.transaction.Transactional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

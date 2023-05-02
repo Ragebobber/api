@@ -1,17 +1,15 @@
 package com.blatant.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +28,10 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductStatus status = ProductStatus.ACTIVE;
 
-    @OneToOne(mappedBy = "productId")
-    private Subscription productSubscription;
+    @OneToMany(mappedBy = "productId",cascade = CascadeType.REMOVE)
+    private List<Subscription> productSubscription = new ArrayList<>();
 
-    public Product(Long id, String name, String description, ProductStatus status,Subscription productSubscription) {
+    public Product(Long id, String name, String description, ProductStatus status,List<Subscription> productSubscription) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -76,11 +74,11 @@ public class Product {
         this.status = status;
     }
     @JsonIgnore
-    public Subscription getProductSubscription() {
+    public List<Subscription> getProductSubscription() {
         return productSubscription;
     }
 
-    public void setProductSubscription(Subscription productSubscription) {
+    public void setProductSubscription(List<Subscription> productSubscription) {
         this.productSubscription = productSubscription;
     }
 }

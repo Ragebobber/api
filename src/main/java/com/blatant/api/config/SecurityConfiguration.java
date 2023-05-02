@@ -1,6 +1,5 @@
 package com.blatant.api.config;
 
-import com.blatant.api.entity.UserRole;
 import com.blatant.api.security.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
