@@ -9,10 +9,12 @@ import com.blatant.api.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -28,13 +30,13 @@ public class ProductService {
         List<Product> products = productRepository.findAll();
         return products.stream().map(elem -> mapper.map(elem, ProductResponse.class)).toList();
     }
-
+    @Transactional
     public ProductResponse addProduct(@NonNull ProductRequest request){
         Product savedProduct = mapper.map(request,Product.class);
         productRepository.save(savedProduct);
         return mapper.map(savedProduct, ProductResponse.class);
     }
-
+    @Transactional
     public ProductResponse activeProduct(@NonNull Long id) throws ProductNotFound {
         Product findProduct = productRepository.findById(id)
                 .orElseThrow(()->
@@ -43,6 +45,7 @@ public class ProductService {
         productRepository.save(findProduct);
         return mapper.map(findProduct, ProductResponse.class);
     }
+    @Transactional
     public ProductResponse edditProduct(Long id,@NonNull ProductRequest request) throws ProductNotFound {
         Product findProduct = productRepository.findById(id)
                 .orElseThrow(()->
@@ -52,6 +55,7 @@ public class ProductService {
         productRepository.save(findProduct);
         return mapper.map(findProduct, ProductResponse.class);
     }
+    @Transactional
     public ProductResponse deleteProduct(Long id) throws ProductNotFound {
         Product findProduct = productRepository.findById(id)
                 .orElseThrow(()->

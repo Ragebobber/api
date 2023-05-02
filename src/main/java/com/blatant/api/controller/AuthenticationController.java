@@ -4,6 +4,7 @@ import com.blatant.api.dto.AuthenticationResponse;
 import com.blatant.api.dto.LoginRequest;
 import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.ResponseStatus;
+import com.blatant.api.dto.UserResponse;
 import com.blatant.api.entity.User;
 import com.blatant.api.security.JWTService;
 import com.blatant.api.security.user.UserSecurityService;
@@ -65,7 +66,7 @@ public class AuthenticationController {
     @PostMapping("/v1/registration")
     public ResponseEntity<?> registration( @RequestBody RegisterRequest request){
         try {
-            User user =  userService.registerUser(request);
+            UserResponse user =  userService.registerUser(request);
            log.info("Success registration: {}",user);
            return  ResponseEntity.ok().body(ResponseStatus.SUCCESS);
         }
