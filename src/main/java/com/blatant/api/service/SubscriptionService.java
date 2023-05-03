@@ -11,11 +11,18 @@ import com.blatant.api.exception.SubscriptionNotFound;
 import com.blatant.api.repository.ProductRepository;
 import com.blatant.api.repository.SubscriptionRepository;
 import com.blatant.api.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,6 +31,7 @@ public class SubscriptionService {
     private final ModelMapper mapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository, ModelMapper mapper, UserRepository userRepository, ProductRepository productRepository) {
         this.subscriptionRepository = subscriptionRepository;
@@ -64,6 +72,32 @@ public class SubscriptionService {
 
         subscriptionRepository.save(subscription);
         return mapper.map(subscription,SubscriptionResponse.class);
-
     }
+
+    @Scheduled(fixedDelayString = "PT12H")//every 12 hours
+    @Transactional
+    public void deactiveSubByExpirationDate() {
+        try {
+            List<Subscription> subscriptions = subscriptionRepository.findAllByExpirationDateBeforeAndIsActive(new Date(),true);
+
+            if(subscriptions.isEmpty())
+            {
+                log.info("Deactivate subs by ex. date is empty: {}, date: {} ",subscriptions,new Date());
+                return;
+            }
+           // Deactivate Subs List
+            subscriptions = subscriptions.stream()
+                    .peek(subscription -> subscription.setActive(false))
+                    .toList();
+
+            subscriptionRepository.saveAll(subscriptions);
+
+            log.info("Deactivate subs: {}, date: {} ",subscriptions,new Date());
+
+        }catch (Exception exception)
+        {
+            log.error("Deactivate subs error: ",exception);
+        }
+    }
+
 }
