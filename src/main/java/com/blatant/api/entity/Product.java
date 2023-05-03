@@ -81,4 +81,14 @@ public class Product {
     public void setProductSubscription(List<Subscription> productSubscription) {
         this.productSubscription = productSubscription;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }
