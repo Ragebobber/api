@@ -1,5 +1,6 @@
 package com.blatant.api.service;
 
+import com.blatant.api.dto.SubscriptionEdditRequest;
 import com.blatant.api.dto.SubscriptionRequest;
 import com.blatant.api.dto.SubscriptionResponse;
 import com.blatant.api.entity.Product;
@@ -70,6 +71,22 @@ public class SubscriptionService {
         subscription.setExpirationDate(request.getExpirationDate());
         subscription.setActive(false);
 
+        subscriptionRepository.save(subscription);
+        return mapper.map(subscription,SubscriptionResponse.class);
+    }
+
+    @Transactional
+    public SubscriptionResponse edditSub(Long id,@NonNull SubscriptionEdditRequest request) throws SubscriptionNotFound {
+        Subscription subscription = subscriptionRepository.findById(id).orElseThrow(()-> new SubscriptionNotFound("No subs"));
+        if(request.getExpirationDate() != null){
+            if (request.getExpirationDate().after(new Date())){
+                subscription.setExpirationDate(request.getExpirationDate());
+            }
+            else{
+                log.warn("Add new Date to Sub error: new date < date now: new Date:{},request:{}",request.getExpirationDate(),request);
+                throw new SubscriptionNotFound("New Date error");
+            }
+        }
         subscriptionRepository.save(subscription);
         return mapper.map(subscription,SubscriptionResponse.class);
     }

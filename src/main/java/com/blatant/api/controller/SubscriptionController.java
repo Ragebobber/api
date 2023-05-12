@@ -1,5 +1,6 @@
 package com.blatant.api.controller;
 
+import com.blatant.api.dto.SubscriptionEdditRequest;
 import com.blatant.api.dto.SubscriptionRequest;
 import com.blatant.api.dto.SubscriptionResponse;
 import com.blatant.api.service.SubscriptionService;
@@ -27,7 +28,7 @@ public class SubscriptionController {
     @PutMapping("/admin/active-sub/{id}")
     public ResponseEntity<?> activeSub(@PathVariable Long id){
         try {
-            SubscriptionResponse response = subscriptionService.activeSub(id);
+            final SubscriptionResponse response = subscriptionService.activeSub(id);
             return  ResponseEntity.ok().body(response);
         }
         catch (Exception exception){
@@ -38,7 +39,7 @@ public class SubscriptionController {
     @PostMapping("/admin/add-sub")
     public ResponseEntity<?> addSub(@RequestBody SubscriptionRequest request){
         try {
-            SubscriptionResponse response = subscriptionService.addSub(request);
+            final SubscriptionResponse response = subscriptionService.addSub(request);
             return  ResponseEntity.ok().body(response);
         }
         catch (Exception exception){
@@ -46,4 +47,16 @@ public class SubscriptionController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @PutMapping("/admin/eddit-sub/{id}")
+    public ResponseEntity<?> edditSub(@PathVariable Long id,@RequestBody SubscriptionEdditRequest request){
+        try {
+            final SubscriptionResponse response = subscriptionService.edditSub(id,request);
+            return  ResponseEntity.ok().body(response);
+        }
+        catch (Exception exception){
+            log.warn("Edit user sub error: {}",exception.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }
