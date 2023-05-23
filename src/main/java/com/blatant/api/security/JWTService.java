@@ -52,7 +52,7 @@ public class JWTService {
             return claims.getSubject();
         }
         catch (Exception e){
-         throw new JWTParseTokenException("Parse JWT error!");
+         throw new JWTParseTokenException(e.getMessage());
         }
     }
 }

@@ -50,6 +50,7 @@ public class UserService {
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.ACTIVE);
 
+        userRepository.save(user);
         return  mapper.map(user,UserResponse.class);
     }
 

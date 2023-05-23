@@ -50,7 +50,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         }
         catch (Exception e){
-            log.warn("Filter jwt auth error:{}",e.getMessage());
+            log.warn("Filter jwt auth error: {}, token:{}",e.getMessage(),token);
             SecurityContextHolder.clearContext();
         }
         filterChain.doFilter(request,response);

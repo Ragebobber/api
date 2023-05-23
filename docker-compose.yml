@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  client-backend:
+    build:
+      context: .
+    container_name: blatant-api
+    depends_on:
+      -  service-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://blatant-postgres:5432/blatant
+      - SPRING_DATASOURCE_USERNAME=${DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - JWT_SECRET_ACCESS_KEY=${JWT_ACCESS_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    links:
+      -  service-db
+
+  service-db:
+    image: postgres:15.1-alpine
+    container_name:  blatant-postgres
+    environment:
+      - POSTGRES_USER=${DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${DATASOURCE_PASSWORD}
+      - POSTGRES_DB=blatant
+    restart: unless-stopped
