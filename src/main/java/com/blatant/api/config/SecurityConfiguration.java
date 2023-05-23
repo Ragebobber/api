@@ -18,7 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfiguration  {
 
-    @Value("${frontendURL}")
+    @Value("${frontend.url}")
     private String corsUrl;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
