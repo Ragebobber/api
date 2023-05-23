@@ -23,4 +23,12 @@ public class UserResponse {
     public void setDateOfRegistration(Date dateOfRegistration) {
         this.dateOfRegistration = dateOfRegistration;
     }
+
+    @Override
+    public String toString() {
+        return "UserResponse{" +
+                "login='" + login + '\'' +
+                ", dateOfRegistration=" + dateOfRegistration +
+                '}';
+    }
 }
