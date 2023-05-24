@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  client-backend:
+  service-backend:
     build:
       context: .
     container_name: blatant-api
@@ -28,4 +28,29 @@ services:
       - POSTGRES_USER=${DATASOURCE_USERNAME}
       - POSTGRES_PASSWORD=${DATASOURCE_PASSWORD}
       - POSTGRES_DB=blatant
+      - POSTGRES_HOST_AUTH_METHOD=trust
     restart: unless-stopped
+    volumes:
+      - service-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-pgAdmin:
+    image: dpage/pgadmin4:latest
+    container_name: blatant-pgAdmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - service-pgAdmin:/var/lib/pgadmin
+
+
+volumes:
+  service-db:
+  service-pgAdmin:
