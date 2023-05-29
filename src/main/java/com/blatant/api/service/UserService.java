@@ -11,6 +11,8 @@ import com.blatant.api.entity.UserStatus;
 import com.blatant.api.exception.RegistrationException;
 import com.blatant.api.repository.UserRepository;
 import com.blatant.api.security.user.UserSecurityService;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
@@ -72,6 +74,9 @@ public class UserService {
 
     }
     @Transactional
+    @Caching(put = {
+            @CachePut(value = "UserService::loadUserByUsername",key = "#request.login")
+    })
     public AdminUserResponse blockUser( @NonNull UserRequest request){
         User user = userRepository.findByLogin(request.getLogin()).orElseThrow(()-> new UsernameNotFoundException("User not found!"));
         user.setStatus(user.getStatus().equals(UserStatus.ACTIVE) ? UserStatus.BLOCKED : UserStatus.ACTIVE);
