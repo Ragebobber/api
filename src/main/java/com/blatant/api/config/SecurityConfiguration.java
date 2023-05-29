@@ -43,7 +43,7 @@ public class SecurityConfiguration  {
                 .httpBasic()
                 .disable()
                 .authorizeHttpRequests(req ->req
-                        .requestMatchers("/api/auth/v1/login","/api/auth/v1/registration")
+                        .requestMatchers("/api/auth/v1/login","/api/auth/v1/registration","/api/health")
                         .permitAll()
                         .requestMatchers(request -> request.getRequestURL().toString().contains("admin"))
                         .hasAuthority("ADMIN")
