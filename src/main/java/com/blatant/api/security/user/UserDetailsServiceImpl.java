@@ -2,6 +2,7 @@ package com.blatant.api.security.user;
 
 import com.blatant.api.entity.User;
 import com.blatant.api.repository.UserRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.userRepository = userRepository;
     }
     @Override
+    @Cacheable(value = "UserService::loadUserByUsername",key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLogin(username).orElseThrow(()->new UsernameNotFoundException("User not found"));
         return new UserSecurityService(user);
