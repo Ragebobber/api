@@ -16,7 +16,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.userRepository = userRepository;
     }
     @Override
-    @Cacheable(value = "UserService::loadUserByUsername",key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLogin(username).orElseThrow(()->new UsernameNotFoundException("User not found"));
         return new UserSecurityService(user);

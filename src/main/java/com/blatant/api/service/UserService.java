@@ -74,9 +74,6 @@ public class UserService {
 
     }
     @Transactional
-    @Caching(put = {
-            @CachePut(value = "UserService::loadUserByUsername",key = "#request.login")
-    })
     public AdminUserResponse blockUser( @NonNull UserRequest request){
         User user = userRepository.findByLogin(request.getLogin()).orElseThrow(()-> new UsernameNotFoundException("User not found!"));
         user.setStatus(user.getStatus().equals(UserStatus.ACTIVE) ? UserStatus.BLOCKED : UserStatus.ACTIVE);
