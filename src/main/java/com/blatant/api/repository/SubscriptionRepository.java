@@ -1,6 +1,7 @@
 package com.blatant.api.repository;
 
 import com.blatant.api.entity.Subscription;
+import com.blatant.api.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription,Long> {
-    List<Subscription> findByUserId(Long id);
+    //List<Subscription> findByUserId(Long id);
 
     /**
      *
@@ -18,4 +19,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
      * @return - Array with active Subs
      */
     List<Subscription> findAllByExpirationDateBeforeAndIsActive(Date date,Boolean isActive);
+    
+    List<Subscription> findByUserId(User userId);
 }

@@ -123,17 +123,18 @@ public class User implements Serializable {
     public void setUserSubscription(List<Subscription> userSubscription) {
         this.userSubscription = userSubscription;
     }
-
+    
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
                 ", hwid='" + hwid + '\'' +
                 ", dateOfRegistration=" + dateOfRegistration +
                 ", role=" + role +
                 ", status=" + status +
-                ", userSubscription=" + userSubscription +
                 '}';
+        
     }
 }

@@ -1,6 +1,7 @@
 package com.blatant.api.service;
 
 import com.blatant.api.dto.SubscriptionEdditRequest;
+import com.blatant.api.dto.SubscriptionLoadResponse;
 import com.blatant.api.dto.SubscriptionRequest;
 import com.blatant.api.dto.SubscriptionResponse;
 import com.blatant.api.entity.Product;
@@ -12,18 +13,22 @@ import com.blatant.api.exception.SubscriptionNotFound;
 import com.blatant.api.repository.ProductRepository;
 import com.blatant.api.repository.SubscriptionRepository;
 import com.blatant.api.repository.UserRepository;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.transaction.annotation.Transactional;
-import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,13 +37,16 @@ public class SubscriptionService {
     private final ModelMapper mapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+
+    private final UserService userService;
     Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, ModelMapper mapper, UserRepository userRepository, ProductRepository productRepository) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, ModelMapper mapper, UserRepository userRepository, ProductRepository productRepository, UserService userService) {
         this.subscriptionRepository = subscriptionRepository;
         this.mapper = mapper;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.userService = userService;
     }
     @Transactional
     public SubscriptionResponse activeSub(Long id) throws SubscriptionNotFound {
@@ -115,6 +123,26 @@ public class SubscriptionService {
         {
             log.error("Deactivate subs error: ",exception);
         }
+    }
+
+    public SubscriptionLoadResponse loadSub(Long id) throws IOException {
+        User currentUser = userService.getUserSecurity().user();
+        List<Subscription> userSubscription = currentUser.getUserSubscription();
+
+        Subscription loadedSubscription = userSubscription.stream()
+                .filter(elem -> (elem.getId().equals(id) && elem.getActive()))
+                .findFirst()
+                .orElse(null);
+
+
+        SubscriptionLoadResponse response = new SubscriptionLoadResponse();
+        if(Objects.isNull(loadedSubscription))
+            return null;
+        File file = new File(loadedSubscription.getProductId().getName() + ".dll");
+        final byte[] fileBytes = Files.readAllBytes(file.toPath());
+        response.setData(Base64.encodeBase64String(fileBytes));
+        return response;
+
     }
 
 }

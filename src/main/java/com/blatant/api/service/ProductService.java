@@ -52,6 +52,7 @@ public class ProductService {
                         new ProductNotFound("Product not found!"));
         findProduct.setName(request.getName());
         findProduct.setDescription(request.getDescription());
+        findProduct.setAltName(request.getAltName());
         productRepository.save(findProduct);
         return mapper.map(findProduct, ProductResponse.class);
     }

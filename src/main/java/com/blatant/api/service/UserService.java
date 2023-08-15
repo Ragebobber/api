@@ -1,6 +1,7 @@
 package com.blatant.api.service;
 
 import com.blatant.api.dto.AdminUserResponse;
+import com.blatant.api.dto.LoginRequest;
 import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.UserRequest;
 import com.blatant.api.dto.UserResponse;
@@ -11,9 +12,6 @@ import com.blatant.api.entity.UserStatus;
 import com.blatant.api.exception.RegistrationException;
 import com.blatant.api.repository.UserRepository;
 import com.blatant.api.security.user.UserSecurityService;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.transaction.annotation.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -21,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -81,7 +80,17 @@ public class UserService {
         return mapper.map(user, AdminUserResponse.class);
     }
 
-    private UserSecurityService getUserSecurity(){
+    @Transactional
+    public void saveUserHwid(@NonNull LoginRequest request,User user){
+        user.setHwid(request.getHwid());
+        userRepository.save(user);
+    }
+
+    public User getUserByUsername(String login){
+        return userRepository.findByLogin(login).orElse(null);
+    }
+
+    public UserSecurityService getUserSecurity(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (UserSecurityService) authentication.getPrincipal();
     }

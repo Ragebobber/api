@@ -1,18 +1,22 @@
 package com.blatant.api.controller;
 
 import com.blatant.api.dto.SubscriptionEdditRequest;
+import com.blatant.api.dto.SubscriptionLoadResponse;
 import com.blatant.api.dto.SubscriptionRequest;
 import com.blatant.api.dto.SubscriptionResponse;
 import com.blatant.api.service.SubscriptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/sub")
@@ -55,6 +59,22 @@ public class SubscriptionController {
         }
         catch (Exception exception){
             log.warn("Edit user sub error: {}",exception.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/load-sub/{id}")
+    public ResponseEntity<?>  loadSub(@PathVariable Long id){
+        try {
+            final SubscriptionLoadResponse response = subscriptionService.loadSub(id);
+
+            if(Objects.isNull(response))
+                return ResponseEntity.badRequest().build();
+
+            return ResponseEntity.ok().body(response);
+        }
+        catch (Exception exception){
+            log.warn("load Sub sub error: {}",exception.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }

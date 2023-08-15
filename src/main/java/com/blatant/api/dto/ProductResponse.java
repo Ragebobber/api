@@ -7,6 +7,16 @@ public class ProductResponse {
     private String name;
     private String description;
     private ProductStatus status;
+    
+    public String getAltName() {
+        return altName;
+    }
+    
+    public void setAltName(String altName) {
+        this.altName = altName;
+    }
+    
+    private String altName;
 
     public Long getId() {
         return id;

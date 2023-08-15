@@ -6,6 +6,16 @@ public class ProductRequest {
     private String description;
     private String name;
     private String status;
+    
+    public String getAltName() {
+        return altName;
+    }
+    
+    public void setAltName(String altName) {
+        this.altName = altName;
+    }
+    
+    private String altName;
 
     public String getDescription() {
         return description;

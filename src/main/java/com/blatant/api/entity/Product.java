@@ -22,7 +22,9 @@ public class Product {
 
     @Column(nullable = false,unique = true)
     private String name;
-
+    
+    @Column(unique = true)
+    private String altName;
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -30,15 +32,16 @@ public class Product {
 
     @OneToMany(mappedBy = "productId",cascade = CascadeType.REMOVE)
     private List<Subscription> productSubscription = new ArrayList<>();
-
-    public Product(Long id, String name, String description, ProductStatus status,List<Subscription> productSubscription) {
+    
+    public Product(Long id, String name, String altName, String description, ProductStatus status, List<Subscription> productSubscription) {
         this.id = id;
         this.name = name;
+        this.altName = altName;
         this.description = description;
         this.status = status;
         this.productSubscription = productSubscription;
     }
-
+    
     protected Product() {
     }
 
@@ -81,12 +84,21 @@ public class Product {
     public void setProductSubscription(List<Subscription> productSubscription) {
         this.productSubscription = productSubscription;
     }
-
+    
+    public String getAltName() {
+        return altName;
+    }
+    
+    public void setAltName(String altName) {
+        this.altName = altName;
+    }
+    
     @Override
     public String toString() {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", altName='" + altName + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';

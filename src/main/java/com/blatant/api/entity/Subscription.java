@@ -86,7 +86,6 @@ public class Subscription {
     public String toString() {
         return "Subscription{" +
                 "id=" + id +
-                ", productId=" + productId +
                 ", expirationDate=" + expirationDate +
                 ", isActive=" + isActive +
                 '}';

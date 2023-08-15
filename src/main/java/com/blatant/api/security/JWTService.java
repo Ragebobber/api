@@ -40,6 +40,34 @@ public class JWTService {
                 .compact();
     }
 
+    public String generateTokenClient(User user, HttpServletRequest request){
+        final Date expirationDate = Date.from(ZonedDateTime.now().plusMinutes(jwtExpirationTime).toInstant());
+        final SecretKey key = Keys.hmacShaKeyFor((jwtAccessSecret + request.getRemoteAddr())
+                .getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .setIssuer("BlatantClientApi")
+                .setSubject(user.getLogin())
+                .claim("hwid",user.getHwid())
+                .setExpiration(expirationDate)
+                .signWith(key,SignatureAlgorithm.HS512)
+                .compact();
+    }
+
+    public Claims getClaims(@NonNull String token,HttpServletRequest request) throws JWTParseTokenException{
+        try {
+            final SecretKey key = Keys.hmacShaKeyFor((jwtAccessSecret+request.getRemoteAddr()).getBytes(StandardCharsets.UTF_8));
+
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+        catch (Exception e){
+            throw new JWTParseTokenException(e.getMessage());
+        }
+    }
+
     public String getUserLogin(@NonNull String token,HttpServletRequest request) throws JWTParseTokenException {
         try {
             final SecretKey key = Keys.hmacShaKeyFor((jwtAccessSecret+request.getRemoteAddr()).getBytes(StandardCharsets.UTF_8));
