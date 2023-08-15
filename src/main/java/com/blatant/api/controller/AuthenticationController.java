@@ -4,16 +4,16 @@ import com.blatant.api.dto.AuthenticationResponse;
 import com.blatant.api.dto.LoginRequest;
 import com.blatant.api.dto.RegisterRequest;
 import com.blatant.api.dto.ResponseStatus;
+import com.blatant.api.dto.UserResponse;
 import com.blatant.api.entity.User;
 import com.blatant.api.security.JWTService;
-import com.blatant.api.security.user.UserDetailsServiceImpl;
 import com.blatant.api.security.user.UserSecurityService;
 import com.blatant.api.service.UserService;
+import io.netty.util.internal.StringUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,28 +52,28 @@ public class AuthenticationController {
 
             AuthenticationResponse response = new AuthenticationResponse();
 
-            response.setAccessToken(jwtService.generateToken(userDetailsService.getUser(),httpServletRequest));
+            response.setAccessToken(jwtService.generateToken(userDetailsService.user(),httpServletRequest));
 
-           log.info("User is authorized, login: {}, ip:{}",userDetailsService.getUser().getLogin(),httpServletRequest.getRemoteAddr());
+           log.info("User is authorized, login: {}, ip:{}",userDetailsService.user().getLogin(),httpServletRequest.getRemoteAddr());
 
             return ResponseEntity.ok().body(response);
         }
         catch (Exception e){
             log.warn("Login warning:{}",e.getMessage());
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(request);
         }
     }
 
     @PostMapping("/v1/registration")
     public ResponseEntity<?> registration( @RequestBody RegisterRequest request){
         try {
-            User user =  userService.registerUser(request);
+            UserResponse user =  userService.registerUser(request);
            log.info("Success registration: {}",user);
            return  ResponseEntity.ok().body(ResponseStatus.SUCCESS);
         }
         catch (Exception e){
             log.warn("Login registration:{}",e.getMessage());
-            return ResponseEntity.ok().body(e.getMessage());
+            return ResponseEntity.badRequest().body(request);
         }
     }
 
@@ -82,8 +82,42 @@ public class AuthenticationController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserSecurityService userDetailsService = (UserSecurityService) authentication.getPrincipal();
         AuthenticationResponse response = new AuthenticationResponse();
-        response.setAccessToken(jwtService.generateToken(userDetailsService.getUser(), httpServletRequest));
+        response.setAccessToken(jwtService.generateToken(userDetailsService.user(), httpServletRequest));
         return ResponseEntity.ok().body(response);
     }
 
+    @PostMapping("/v1/client-login")
+    public ResponseEntity<Object> clientLogin(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest){
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getLogin(),request.getPassword())
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            UserSecurityService userDetailsService = (UserSecurityService) authentication.getPrincipal();
+            AuthenticationResponse response = new AuthenticationResponse();
+            response.setAccessToken(jwtService.generateTokenClient(userDetailsService.user(),httpServletRequest));
+
+            User curUser = userDetailsService.user();
+
+            if(StringUtil.isNullOrEmpty(curUser.getHwid()) && !StringUtil.isNullOrEmpty(request.getHwid())){
+                userService.saveUserHwid(request,userDetailsService.user());
+                return ResponseEntity.ok().body(response);
+            }
+
+            if(!userDetailsService.user().getHwid().equals(request.getHwid())){
+                return ResponseEntity.badRequest().body("Incorrect HWID");
+            }
+            
+           log.info("Client login success:{}",curUser);
+            
+            return ResponseEntity.ok().body(response);
+
+        }
+        catch (Exception e){
+            log.warn("Client login warning:{}",e.getMessage());
+            return ResponseEntity.badRequest().body(request);
+        }
+    }
 }

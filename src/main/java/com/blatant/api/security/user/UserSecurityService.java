@@ -6,18 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
-
-public class UserSecurityService implements UserDetails {
-
-    private final User user;
-
-    public UserSecurityService(User user) {
-        this.user = user;
-    }
+public record UserSecurityService(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -53,8 +44,6 @@ public class UserSecurityService implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    public User getUser() {
-        return user;
-    }
+    
+    
 }

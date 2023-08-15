@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,12 +13,14 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -40,8 +43,8 @@ public class User {
     @Column(nullable = false)
     private UserStatus status;
 
-    @OneToMany(mappedBy = "userId")
-    private List<Subscription> userSubscription;
+    @OneToMany(mappedBy = "userId",fetch = FetchType.EAGER)
+    private List<Subscription> userSubscription = new ArrayList<>();
 
     public User(Long id, String login, String password, String hwid, Date dateOfRegistration, UserRole role, UserStatus status, List<Subscription> userSubscription) {
         this.id = id;
@@ -120,17 +123,18 @@ public class User {
     public void setUserSubscription(List<Subscription> userSubscription) {
         this.userSubscription = userSubscription;
     }
-
+    
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
                 ", hwid='" + hwid + '\'' +
                 ", dateOfRegistration=" + dateOfRegistration +
                 ", role=" + role +
                 ", status=" + status +
-                ", userSubscription=" + userSubscription +
                 '}';
+        
     }
 }

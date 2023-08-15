@@ -1,29 +1,46 @@
 package com.blatant.api.service;
 
+import com.blatant.api.dto.AdminUserResponse;
+import com.blatant.api.dto.LoginRequest;
 import com.blatant.api.dto.RegisterRequest;
+import com.blatant.api.dto.UserRequest;
+import com.blatant.api.dto.UserResponse;
+import com.blatant.api.entity.Subscription;
 import com.blatant.api.entity.User;
 import com.blatant.api.entity.UserRole;
 import com.blatant.api.entity.UserStatus;
 import com.blatant.api.exception.RegistrationException;
 import com.blatant.api.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.blatant.api.security.user.UserSecurityService;
+import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
+
     private final PasswordEncoder encoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
+    private final ModelMapper mapper;
+
+    public UserService(UserRepository userRepository, PasswordEncoder encoder, ModelMapper mapper) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.mapper = mapper;
     }
 
     @Transactional
-    public User registerUser(@NonNull RegisterRequest request) throws RegistrationException {
+    public UserResponse registerUser(@NonNull RegisterRequest request) throws RegistrationException {
         User user =  userRepository.findByLogin(request.getLogin()).orElse(null);
         if(user != null)
             throw new RegistrationException("User already exists" + user);
@@ -33,7 +50,49 @@ public class UserService {
         user.setPassword(encoder.encode(request.getPassword()));
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.ACTIVE);
-        return userRepository.save(user);
+
+        userRepository.save(user);
+        return  mapper.map(user,UserResponse.class);
+    }
+
+    public UserResponse getCurrnetUser(){
+        return mapper.map(getUserSecurity().user(),UserResponse.class);
+    }
+
+    public List<Subscription> getCurrentUserSubs() {
+
+        User user = userRepository.findById(getUserSecurity().user().getId())
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+
+        return user.getUserSubscription();
+    }
+
+    public List<AdminUserResponse> getAllUsers(){
+        List<User> allUsers = userRepository.findAll();
+        return allUsers.stream().map(elem -> mapper.map(elem,AdminUserResponse.class)).toList();
+
+    }
+    @Transactional
+    public AdminUserResponse blockUser( @NonNull UserRequest request){
+        User user = userRepository.findByLogin(request.getLogin()).orElseThrow(()-> new UsernameNotFoundException("User not found!"));
+        user.setStatus(user.getStatus().equals(UserStatus.ACTIVE) ? UserStatus.BLOCKED : UserStatus.ACTIVE);
+        userRepository.save(user);
+        return mapper.map(user, AdminUserResponse.class);
+    }
+
+    @Transactional
+    public void saveUserHwid(@NonNull LoginRequest request,User user){
+        user.setHwid(request.getHwid());
+        userRepository.save(user);
+    }
+
+    public User getUserByUsername(String login){
+        return userRepository.findByLogin(login).orElse(null);
+    }
+
+    public UserSecurityService getUserSecurity(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (UserSecurityService) authentication.getPrincipal();
     }
 
 }

@@ -1,6 +1,9 @@
 package com.blatant.api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,14 +15,15 @@ import java.util.Date;
 @Entity
 public class Subscription {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId",nullable = false)
+    @JoinColumn(name = "user_id",nullable = false)
     private User userId;
 
     @ManyToOne
-    @JoinColumn(name = "productId",nullable = false)
+    @JoinColumn(name = "product_id",nullable = false)
     private Product productId;
 
     @Temporal(TemporalType.DATE)
@@ -27,7 +31,7 @@ public class Subscription {
 
     Boolean isActive;
 
-    protected Subscription() {
+    public Subscription() {
     }
 
     public Subscription(Long id, User userId, Product productId, Date expirationDate, Boolean isActive) {
@@ -45,7 +49,7 @@ public class Subscription {
     public void setId(Long id) {
         this.id = id;
     }
-
+    @JsonIgnore
     public User getUserId() {
         return userId;
     }
@@ -76,5 +80,14 @@ public class Subscription {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "id=" + id +
+                ", expirationDate=" + expirationDate +
+                ", isActive=" + isActive +
+                '}';
     }
 }

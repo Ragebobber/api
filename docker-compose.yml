@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  service-backend:
+    build:
+      context: .
+    container_name: api
+    depends_on:
+      -  service-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/blatant
+      - SPRING_DATASOURCE_USERNAME=${DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DATASOURCE_PASSWORD}
+      - JWT_SECRET_ACCESS_KEY=${JWT_ACCESS_KEY}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - SPRING_JPA_SHOW-SQL=false
+      - SPRING_CACHE_TYPE=redis
+      - SPRING_CACHE_CACHE-NAMES=redis-cache
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
+    expose:
+      - "8080"
+    ports:
+      - "8080:8080"
+    links:
+      -  service-db
+
+  service-db:
+    image: postgres:15.1-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=${DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${DATASOURCE_PASSWORD}
+      - POSTGRES_DB=blatant
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    restart: unless-stopped
+    volumes:
+      - service-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d blatant -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  service-pgAdmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgAdmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - service-pgAdmin:/var/lib/pgadmin
+
+  service-redis:
+    image: redis:7.2-rc-alpine
+    restart: always
+    container_name: redis
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - service-redis:/data
+
+volumes:
+  service-db:
+  service-pgAdmin:
+  service-redis:
