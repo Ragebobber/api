@@ -2,7 +2,6 @@ package com.blatant.api.config;
 
 import com.blatant.api.security.JWTAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,8 +18,8 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 public class SecurityConfiguration  {
 
-    @Value("${frontend.url}")
-    private String corsUrl;
+//    @Value("${frontend.url}")
+//    private String corsUrl;
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
@@ -39,7 +38,6 @@ public class SecurityConfiguration  {
                             corsConfigurer.addAllowedHeader("*");
                             return corsConfigurer;
                         }))
-              //  .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req

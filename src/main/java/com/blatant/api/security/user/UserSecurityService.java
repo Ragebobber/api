@@ -1,5 +1,6 @@
 package com.blatant.api.security.user;
 
+import com.blatant.api.entity.Subscription;
 import com.blatant.api.entity.User;
 import com.blatant.api.entity.UserStatus;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,6 +44,10 @@ public record UserSecurityService(User user) implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    
+    public List<Subscription> getSubscriptions(){
+        return user.getUserSubscription();
     }
     
     
