@@ -33,10 +33,9 @@ public class SecurityController {
         }
     }
     @PostMapping("/info")
-    public ResponseEntity<?> getInfo(@RequestBody SecurityInfoRequest request){
+    public ResponseEntity<?> getInfo(@RequestBody SecurityInfoRequest request,HttpServletRequest httpServletRequest){
         try {
-            log.info(request.getHash());
-          //  securityService.debugCheck(httpServletRequest);
+            securityService.hashCheck(request,httpServletRequest);
             return ResponseEntity.ok("0x13");
         }
         catch (Exception e) {
